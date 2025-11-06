@@ -132,12 +132,12 @@
     <ClCompile Include="ShipPlacer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AI.h" />
-    <ClInclude Include="Cell.h" />
-    <ClInclude Include="GameBoard.h" />
-    <ClInclude Include="GameSession.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="ShipPlacer.h" />
+    <ClInclude Include="AI.hpp" />
+    <ClInclude Include="Cell.hpp" />
+    <ClInclude Include="GameBoard.hpp" />
+    <ClInclude Include="GameSession.hpp" />
+    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="ShipPlacer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,25 +3,27 @@
 
 // laba3.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
 //
-#include "GameSession.h"
-#include "Cell.h"
-#include "GameBoard.h"
+#include "GameSession.hpp"
+#include "Cell.hpp"
+#include "GameBoard.hpp"
 #include <iostream>
-#include "ShipPlacer.h"
+#include "ShipPlacer.hpp"
 #include <locale>
+
 
 using namespace std;
 
 // Точка входа в программу
 int main() {
     setlocale(LC_ALL, "Russian");  // Установка русской локали
-
+  //  game.DynamicObjects();
+   // game.YkazObject();
     cout << "=== МОРСКОЙ БОЙ ===" << endl;
 
     // Ввод имени игрока
     string playerName;
     cout << "Введите ваше имя: ";
-    getline(cin, playerName);
+    cin >> playerName;
     
     // Проверка на пустое имя
     if (playerName.empty()) {
@@ -36,8 +38,7 @@ int main() {
 
     cout << "\nСпасибо за игру!" << endl;
 
-    // Если создавали через new, нужно было бы:
-    // delete game;
+    
 
     return 0;
 }

@@ -1,4 +1,5 @@
-#include "Player.h"
+#include "Player.hpp"
+#include "GameSession.hpp"
 #include <iostream>
 
 using namespace std;
@@ -24,10 +25,6 @@ Player::~Player() {
 
    // cout << "Динамическая память игрока освобождена" << endl;
 }
-
-
-
-
 
 // Выполнение хода игрока
 bool Player::makeMove(int x, int y) {
@@ -71,20 +68,20 @@ void Player::displayBoards() const {
 
     // Верхние буквенные координаты для обоих полей
     cout << "  ";
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
         cout << " " << static_cast<char>('A' + i);
     }
     cout << "     ";
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
         cout << " " << static_cast<char>('A' + i);
     }
     cout << endl;
 
     // Отображение строк обоих полей
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
         // Левое поле (собственное)
-        cout << (i + 1) << (i < 9 ? " " : "");  // Номер строки с выравниванием
-        for (int j = 0; j < 10; j++) {
+        cout << (i + 1) << (i < GameSession::SIZE_BOARD-1 ? " " : "");  // Номер строки с выравниванием
+        for (int j = 0; j < GameSession::SIZE_BOARD; j++) {
             CellState state = ownBoard->getCell(i, j).getState();
             char symbol = '~';
 
@@ -101,8 +98,8 @@ void Player::displayBoards() const {
         cout << "   ";  // Разделитель между полями
 
         // Правое поле (противника)
-        cout << (i + 1) << (i < 9 ? " " : "");
-        for (int j = 0; j < 10; j++) {
+        cout << (i + 1) << (i < GameSession::SIZE_BOARD-1 ? " " : "");
+        for (int j = 0; j < GameSession::SIZE_BOARD; j++) {
             CellState state = enemyBoard.getCell(i, j).getState();  // Используем ссылку
             char symbol = '~';
 

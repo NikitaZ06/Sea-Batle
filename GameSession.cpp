@@ -1,13 +1,13 @@
-#include "GameSession.h"
+#include "GameSession.hpp"
 #include <iostream>
 #include <limits>
-#include "ShipPlacer.h"
+#include "ShipPlacer.hpp"
 
 using namespace std;
 
 // КОНСТРУКТОР GameSession - создает все объекты динамически
 GameSession::GameSession(const std::string& playerName)
-    : isPlayerTurn(true), moveCount(0), maxMoves(100) {
+    : isPlayerTurn(true), moveCount(0), maxMoves(KOLVO_CELLS) {
 
     // ДИНАМИЧЕСКОЕ СОЗДАНИЕ ОБЪЕКТОВ с помощью оператора NEW
 
@@ -39,10 +39,11 @@ GameSession::~GameSession() {
 }
 
 // Демонстрация работы с динамическими объектами и массивами
-void GameSession::DynamicObjects() {
+void GameSession::DynamicObjects    () {
     cout << "\n=== ДЕМОНСТРАЦИЯ ДИНАМИЧЕСКИХ ОБЪЕКТОВ ===" << endl;
 
     // 1. ДИНАМИЧЕСКИЙ МАССИВ ОБЪЕКТОВ КЛАССА Cell
+    /*
     cout << "1. Создание динамического массива объектов Cell..." << endl;
     Cell* cellArray = new Cell[5];  // Массив из 5 объектов Cell
 
@@ -54,8 +55,17 @@ void GameSession::DynamicObjects() {
 
     delete[] cellArray;  // Очистка динамического массива объектов
     cout << "Динамический массив Cell удален" << endl;
-
-    // 2. МАССИВ ДИНАМИЧЕСКИХ ОБЪЕКТОВ GameBoard
+    */
+    //
+ //   Cell* cel = new Cell[SIZE_BOARD];
+ ////   CellState = c;
+ //   for (int i = 0; i < SIZE_BOARD; i++) {
+ //       CellState c = cel->getState();
+ //       if (c == CellState::EMPTY)cout << "Клетка пуста";
+ //   }
+ //   delete[] cel;
+    // 2. МАССИВ ДИНАМИЧЕСКИХ ОБЪЕКТОВ GameBoard/*
+    
     cout << "\n2. Создание массива динамических объектов GameBoard..." << endl;
     GameBoard** boardArray = new GameBoard * [3];  // Массив указателей на GameBoard
 
@@ -218,7 +228,7 @@ void GameSession::playerTurn() {
         }
 
         // Проверка границ поля
-        if (x < 0 || x >= 10 || y < 0 || y >= 10) {
+        if (x < 0 || x >= SIZE_BOARD || y < 0 || y >= SIZE_BOARD) {
             cout << "Координаты вне поля!" << endl;
             continue;
         }
@@ -295,8 +305,8 @@ void GameSession::displayMoveHistory() const {
 // Синхронизация полей 
 void GameSession::syncPlayerEnemyBoard() {
     // Копируем все состояния из aiBoard в enemyBoard игрока
-    for (int i = 0; i < 10; i++) {
-        for (int j = 0; j < 10; j++) {
+    for (int i = 0; i < SIZE_BOARD; i++) {
+        for (int j = 0; j < SIZE_BOARD; j++) {
             CellState aiState = aiBoard->getCell(i, j).getState();
             humanPlayer->getEnemyBoard().getCell(i, j).setState(aiState);
         }

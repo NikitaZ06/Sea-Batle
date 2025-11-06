@@ -1,4 +1,4 @@
-#include "Cell.h"
+#include "Cell.hpp"
 
 //  онструктор по умолчанию - инициализирует пол€
 Cell::Cell()
@@ -28,10 +28,5 @@ void Cell::setHasShip(bool hasShip) {
     this->hasShip = hasShip;  // ”станавливаем новое значение (this-> дл€ устранени€ неоднозначности)
 
     // јвтоматически обновл€ем состо€ние в зависимости от наличи€ корабл€
-    if (hasShip) {
-        state = CellState::SHIP;  // ≈сли есть корабль - состо€ние "корабль"
-    }
-    else {
-        state = CellState::EMPTY; // ≈сли корабль убран - состо€ние "пусто"
-    }
+    state = hasShip ? CellState::SHIP : CellState::EMPTY;
 }

@@ -1,6 +1,6 @@
-#include "ShipPlacer.h"
+#include "ShipPlacer.hpp"
 #include <algorithm>
-#include "ShipPlacer.h"
+#include "GameSession.hpp"
 #include <cstdlib>
 #include <ctime>
 
@@ -14,8 +14,7 @@ ShipPlacer::ShipPlacer(GameBoard& gameBoard)
 bool ShipPlacer::AutoPlaceShips() {
     // СОЗДАНИЕ ДИНАМИЧЕСКОГО МАССИВА ДЛЯ ХРАНЕНИЯ РАЗМЕРОВ КОРАБЛЕЙ
     // Классические правила: 1x4, 2x3, 3x2, 4x1
-    int* shipSizes = new int[10] {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
-
+    std::vector<int> shipSizes = { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
     bool success = true;  // Флаг успешной расстановки
 
     // Размещаем каждый корабль из динамического массива
@@ -26,15 +25,12 @@ bool ShipPlacer::AutoPlaceShips() {
         }
     }
 
-    // ОЧИСТКА ДИНАМИЧЕСКОЙ ПАМЯТИ - ВАЖНО!
-    delete[] shipSizes;
-
     return success;
 }
 
 // Размещение одного корабля заданного размера
 bool ShipPlacer::placeSingleShip(int size) {
-    return tryPlaceShip(size, 100);  // 100 попыток на размещение
+    return tryPlaceShip(size, GameSession::KOLVO_CELLS);  // 100 попыток на размещение
 }
 
 // Попытка размещения корабля с случайными координатами
@@ -42,8 +38,8 @@ bool ShipPlacer::tryPlaceShip(int size, int maxAttempts) {
     // Пытаемся разместить корабль в случайной позиции
     for (int attempt = 0; attempt < maxAttempts; attempt++) {
         // Генерируем случайные координаты и направление
-        int x = rand() % 10;
-        int y = rand() % 10;
+        int x = rand() % GameSession::SIZE_BOARD;
+        int y = rand() % GameSession::SIZE_BOARD;
         bool horizontal = rand() % 2 == 0;  // Случайное направление
 
         // Пытаемся разместить корабль
