@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using System;
-namespace Laba4
+namespace Sea_battle
 {
     public class AI
     {
@@ -37,7 +36,8 @@ namespace Laba4
                 y = random.Next(0, 10);
 
                 // Проверяем, не стреляли ли уже сюда
-                CellState state = enemyBoard.GetCell(x, y).GetState();
+                // CellState state = enemyBoard.GetCell(x, y).GetState();
+                CellState state = enemyBoard.GetCell(x, y).State;
                 if (state != CellState.Hit && state != CellState.Miss)
                 {
                     validShot = true;
@@ -48,16 +48,6 @@ namespace Laba4
             Console.Write($"в {(char)('A' + y)}{(x + 1)}... ");
 
             bool wasHit = enemyBoard.ReceiveShot(x, y);
-            /*
-            if (wasHit)
-            {
-                Console.WriteLine("ПОПАДАНИЕ!");
-            }
-            else
-            {
-                Console.WriteLine("ПРОМАХ!");
-            }
-            */
             string result = wasHit ? "ПОПАДАНИЕ!" : "ПРОМАХ!";
             Console.WriteLine(result);
         }
@@ -67,15 +57,6 @@ namespace Laba4
         {
             ShipPlacer placer = new ShipPlacer(ownBoard);
             bool exit;
-            /*
-            if (placer.AutoPlaceShips() == true)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }*/
             exit=placer.AutoPlaceShips() == true?true:false;
             return exit;
         }

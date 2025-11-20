@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Laba4
+namespace Sea_battle
 {
     // Класс для автоматической расстановки кораблей на игровом поле
     public class ShipPlacer

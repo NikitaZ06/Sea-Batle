@@ -1,7 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System;
 
-namespace Battleship
+namespace Sea_battle
 {
     // Главный класс программы - точка входа в приложение
 

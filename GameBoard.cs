@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Laba4
+namespace Sea_battle
 {
     /// Класс, представляющий игровое поле
     public class GameBoard
@@ -48,7 +48,7 @@ namespace Laba4
 
                 for (int j = 0; j < SIZE; j++)
                 {
-                    CellState state = grid[i, j].GetState();
+                    CellState state = grid[i, j].State;
                     char symbol = '~';  // Символ по умолчанию
 
                     switch (state)
@@ -78,14 +78,15 @@ namespace Laba4
             {
                 for (int i = 0; i < size; i++)
                 {
-                    grid[x, y + i].SetHasShip(true);
+                    // grid[x, y + i].SetHasShip(true);
+                    grid[x, y + i].HasShip = true; ;
                 }
             }
             else
             {
                 for (int i = 0; i < size; i++)
                 {
-                    grid[x + i, y].SetHasShip(true);
+                    grid[x + i, y].HasShip = true;
                 }
             }
             return true; // Размещение успешно
@@ -96,14 +97,14 @@ namespace Laba4
         {
             if (!IsValidPosition(x, y)) return false;
 
-            if (grid[x, y].GetHasShip())
+            if (grid[x, y].HasShip)
             {
-                grid[x, y].SetState(CellState.Hit);
+                grid[x, y].State = CellState.Hit;
                 return true;  // Попадание
             }
             else
             {
-                grid[x, y].SetState(CellState.Miss);
+                grid[x, y].State = CellState.Miss;
                 return false; // Промах
             }
         }
@@ -116,8 +117,8 @@ namespace Laba4
                 for (int j = 0; j < SIZE; j++)
                 {
                     // Если есть корабль, который еще не подбит
-                    if (grid[i, j].GetHasShip() &&
-                        grid[i, j].GetState() != CellState.Hit)
+                    if (grid[i, j].HasShip &&
+                        grid[i, j].State != CellState.Hit)
                     {
                         return false;  // Игра не окончена
                     }
@@ -127,15 +128,16 @@ namespace Laba4
         }
 
         // Получение размера поля
-        public int GetSize()
+        public int Size
         {
-            return SIZE;
+            get { return SIZE; }
         }
         // Получение ячейки по координата
         public Cell GetCell(int x, int y)
         {
             return grid[x, y];
         }
+
 
         // Проверка валидности позиции
         public bool IsValidPosition(int x, int y)
@@ -147,7 +149,11 @@ namespace Laba4
         public bool CanPlaceShip(int x, int y, int size, bool horizontal)
         {
             // Проверка выхода за границы поля
-            if (horizontal)
+            if (horizontal ? (y + size > SIZE) : (x + size > SIZE))
+            {
+                return false;
+            }
+            /* if (horizontal)
             {
                 if (y + size > SIZE)
                 {
@@ -160,7 +166,7 @@ namespace Laba4
                 {
                     return false; // Корабль выходит за нижнюю границу
                 }
-            }
+            }*/
 
             // Проверка что все целевые клетки свободны
             for (int i = 0; i < size; i++)
@@ -170,7 +176,7 @@ namespace Laba4
 
                 // Если клетка невалидна или уже занята кораблем
                 if (!IsValidPosition(checkX, checkY) ||
-                    grid[checkX, checkY].GetHasShip())
+                    grid[checkX, checkY].HasShip)
                 {
                     return false;
                 }
@@ -201,7 +207,7 @@ namespace Laba4
                 for (int j = startY; j <= endY; j++)
                 {
                     // Если в этой клетке есть корабль
-                    if (grid[i, j].GetHasShip())
+                    if (grid[i, j].HasShip)
                     {
                         return false;
                     }

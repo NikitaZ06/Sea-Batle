@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Laba4
+namespace Sea_battle
 {
 
     // Класс, представляющий игрока
@@ -29,7 +29,7 @@ namespace Laba4
         public bool MakeMove(int x, int y)
         {
             // Проверка повторного выстрела
-            CellState state = enemyBoard.GetCell(x, y).GetState();
+            CellState state = enemyBoard.GetCell(x, y).State;
             if (state == CellState.Hit || state == CellState.Miss)
             {
                 Console.WriteLine("Вы уже стреляли в эту клетку!");
@@ -51,18 +51,10 @@ namespace Laba4
         {
             return ownBoard.IsGameOver();
         }
-
         // Получение имени игрока
-
-        public string GetName()
+        public string Name
         {
-            return name;
-        }
-
-        // Простая проверка для AI (все корабли потоплены)
-        private bool AIHasLost()
-        {
-            return ownBoard.IsGameOver();
+            get { return name; }
         }
 
 
@@ -95,7 +87,7 @@ namespace Laba4
 
                 for (int j = 0; j < 10; j++)
                 {
-                    CellState state = ownBoard.GetCell(i, j).GetState();
+                    CellState state = ownBoard.GetCell(i, j).State;
                     char symbol = '~';
 
                     switch (state)
@@ -116,7 +108,7 @@ namespace Laba4
 
                 for (int j = 0; j < 10; j++)
                 {
-                    CellState state = enemyBoard.GetCell(i, j).GetState();
+                    CellState state = enemyBoard.GetCell(i, j).State;
                     char symbol = '~';
 
                     switch (state)
@@ -132,20 +124,17 @@ namespace Laba4
                 Console.WriteLine();
             }
         }
-
-        // Геттеры для доступа к полям (аналогично C++ версии)
-
  
         // Получение собственного поля игрока
-        public GameBoard GetOwnBoard()
+        public GameBoard OwnBoard
         {
-            return ownBoard;
+            get {return ownBoard; }
         }
 
         // Получение поля противника
-        public GameBoard GetEnemyBoard()
+        public GameBoard EnemyBoard
         {
-            return enemyBoard;
+            get { return enemyBoard; }
         }
     }
 }

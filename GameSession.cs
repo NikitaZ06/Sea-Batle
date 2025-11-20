@@ -1,4 +1,4 @@
-﻿using Laba4;
+﻿
 using System;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Battleship
+namespace Sea_battle
 {
 
     //Класс управления игровой сессией "Морской бой"
@@ -24,7 +24,7 @@ namespace Battleship
         {
             aiBoard = new GameBoard();                           // 1. Сначала создаем aiBoard
             humanPlayer = new Player(playerName, aiBoard);       // 2. Затем Player с ссылкой на aiBoard
-            computerAI = new AI(aiBoard, humanPlayer.GetOwnBoard()); // 3. AI получает aiBoard и поле игрока
+            computerAI = new AI(aiBoard, humanPlayer.OwnBoard); // 3. AI получает aiBoard и поле игрока
             isPlayerTurn = true;
         }
 
@@ -32,7 +32,7 @@ namespace Battleship
         public void StartGame()
         {
             Console.WriteLine("=== МОРСКОЙ БОЙ ===");
-            Console.WriteLine($"Добро пожаловать, {humanPlayer.GetName()}!");
+            Console.WriteLine($"Добро пожаловать, {humanPlayer.Name}!");
 
             // 1. НАСТРОЙКА  
             SetupGame();
@@ -77,7 +77,7 @@ namespace Battleship
             Console.WriteLine("\n--- РАССТАНОВКА КОРАБЛЕЙ ---");
 
             // ИГРОК расставляет
-            ShipPlacer playerPlacer = new ShipPlacer(humanPlayer.GetOwnBoard());
+            ShipPlacer playerPlacer = new ShipPlacer(humanPlayer.OwnBoard);
             Console.WriteLine("Ваша расстановка:");
             playerPlacer.AutoPlaceShips();
 
@@ -134,7 +134,7 @@ namespace Battleship
             }
 
             // Проверяем, не стреляли ли уже сюда
-            CellState aiCellState = aiBoard.GetCell(x, y).GetState();
+            CellState aiCellState = aiBoard.GetCell(x, y).State;
 
             if (aiCellState == CellState.Hit || aiCellState == CellState.Miss)
             {
@@ -149,12 +149,12 @@ namespace Battleship
                 if (wasHit)
                 {
                     Console.WriteLine("ПОПАДАНИЕ! Вы попали в корабль противника!");
-                    humanPlayer.GetEnemyBoard().GetCell(x, y).SetState(CellState.Hit);
+                    humanPlayer.EnemyBoard.GetCell(x, y).State=CellState.Hit;
                 }
                 else
                 {
                     Console.WriteLine("ПРОМАХ!");
-                    humanPlayer.GetEnemyBoard().GetCell(x, y).SetState(CellState.Miss);
+                    humanPlayer.EnemyBoard.GetCell(x, y).State = CellState.Miss;
                 }
             }
 
@@ -180,7 +180,7 @@ namespace Battleship
                 y = random.Next(0, 10);
 
                 // Проверяем, не стреляли ли уже сюда
-                CellState state = humanPlayer.GetOwnBoard().GetCell(x, y).GetState();
+                CellState state = humanPlayer.OwnBoard.GetCell(x, y).State;
                 if (state != CellState.Hit && state != CellState.Miss)
                 {
                     validShot = true;
@@ -194,7 +194,7 @@ namespace Battleship
             Console.Write($"Противник стреляет в {column}{row}... ");
 
             // AI стреляет по полю игрока
-            bool wasHit = humanPlayer.GetOwnBoard().ReceiveShot(x, y);
+            bool wasHit = humanPlayer.OwnBoard.ReceiveShot(x, y);
 
             string t;
             t=wasHit ? "ПОПАДАНИЕ!" : "ПРОМАХ!";
@@ -220,8 +220,8 @@ namespace Battleship
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    CellState aiState = aiBoard.GetCell(i, j).GetState();
-                    humanPlayer.GetEnemyBoard().GetCell(i, j).SetState(aiState);
+                    CellState aiState = aiBoard.GetCell(i, j).State;
+                    humanPlayer.EnemyBoard.GetCell(i, j).State = aiState;
                 }
             }
         }

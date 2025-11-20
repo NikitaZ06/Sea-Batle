@@ -14,40 +14,19 @@ public enum CellState
 
 public class Cell
 {
-    private CellState state;    // Текущее состояние ячейки
-    private bool hasShip;       // Флаг наличия корабля
+    private CellState state;
 
-    // Конструктор
-    public Cell()
+    // Свойство состояния
+    public CellState State
     {
-        state = CellState.Empty;  // Инициализация state значением Empty
-        hasShip = false;          // Инициализация hasShip значением false
+        get => state;
+        set => state = value;
     }
 
-    // Возвращает текущее состояние ячейки
-    public CellState GetState()
+    // Вычисляемое свойство наличия корабля
+    public bool HasShip
     {
-        return state;  // Просто возвращаем значение поля state
-    }
-
-    // Возвращает true, если в ячейке есть корабль
-    public bool GetHasShip()
-    {
-        return hasShip;  // Возвращаем значение поля hasShip
-    }
-
-    // Устанавливает новое состояние ячейки
-    public void SetState(CellState newState)
-    {
-        state = newState;  // Присваиваем полю state новое значение
-    }
-
-    // Устанавливает флаг наличия корабля в ячейке
-    public void SetHasShip(bool hasShipValue)
-    {
-        hasShip = hasShipValue;  // Устанавливаем новое значение
-
-        // Если в ячейке теперь есть корабль,
-        state=hasShip ? CellState.Ship : CellState.Empty;
+        get => state == CellState.Ship;
+        set => state = value ? CellState.Ship : CellState.Empty;
     }
 }
