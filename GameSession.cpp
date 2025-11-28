@@ -2,6 +2,7 @@
 #include <iostream>
 #include <limits>
 #include "ShipPlacer.hpp"
+#include <memory>
 
 using namespace std;
 
@@ -9,136 +10,31 @@ using namespace std;
 GameSession::GameSession(const std::string& playerName)
     : isPlayerTurn(true), moveCount(0), maxMoves(KOLVO_CELLS) {
 
-    // ДИНАМИЧЕСКОЕ СОЗДАНИЕ ОБЪЕКТОВ с помощью оператора NEW
+    // СОЗДАНИЕ ОБЪЕКТОВ ЧЕРЕЗ УМНЫЕ УКАЗАТЕЛИ
 
-    // 1. Создаем поле AI
-    aiBoard = new GameBoard();
+    // 1. Создаем поле AI через make_unique
+    aiBoard = std::make_unique<GameBoard>();
 
     // 2. Создаем игрока, передавая ссылку на поле AI
-    humanPlayer = new Player(playerName, *aiBoard);  
+    humanPlayer = std::make_unique<Player>(playerName, *aiBoard);
 
     // 3. Создаем AI, передавая ссылки на оба поля
-    computerAI = new AI(*aiBoard, humanPlayer->getOwnBoard());
+    computerAI = std::make_unique<AI>(*aiBoard, humanPlayer->getOwnBoard());
 
     // 4. Создаем ДИНАМИЧЕСКИЙ МАССИВ для истории ходов
-    moveHistory = new string[maxMoves];
+    moveHistory = std::make_unique<std::string[]>(maxMoves);
+    aiHistory = std::make_unique<std::string[]>(maxMoves);
 
-    cout << "Динамические объекты созданы!" << endl;
+    cout << "Объекты созданы через умные указатели!" << endl;
 }
 
-// ДЕСТРУКТОР GameSession - очистка всей динамической памяти
-GameSession::~GameSession() {
-    // ОЧИСТКА ПАМЯТИ 
 
-    delete computerAI;    // Удаляем AI
-    delete humanPlayer;   // Удаляем игрока
-    delete aiBoard;       // Удаляем поле AI
-    delete[] moveHistory; // Удаляем динамический массив (используем delete[])
-
-    cout << "Динамическая память освобождена!" << endl;
-}
-
-// Демонстрация работы с динамическими объектами и массивами
-void GameSession::DynamicObjects    () {
-    cout << "\n=== ДЕМОНСТРАЦИЯ ДИНАМИЧЕСКИХ ОБЪЕКТОВ ===" << endl;
-
-    // 1. ДИНАМИЧЕСКИЙ МАССИВ ОБЪЕКТОВ КЛАССА Cell
-    /*
-    cout << "1. Создание динамического массива объектов Cell..." << endl;
-    Cell* cellArray = new Cell[5];  // Массив из 5 объектов Cell
-
-    // Работа с массивом объектов
-    for (int i = 0; i < 5; i++) {
-        cellArray[i].setHasShip(i % 2 == 0);  // Устанавливаем корабли в четные ячейки
-        cout << "Cell[" << i << "]: hasShip = " << cellArray[i].getHasShip() << endl;
-    }
-
-    delete[] cellArray;  // Очистка динамического массива объектов
-    cout << "Динамический массив Cell удален" << endl;
-    */
-    //
- //   Cell* cel = new Cell[SIZE_BOARD];
- ////   CellState = c;
- //   for (int i = 0; i < SIZE_BOARD; i++) {
- //       CellState c = cel->getState();
- //       if (c == CellState::EMPTY)cout << "Клетка пуста";
- //   }
- //   delete[] cel;
-    // 2. МАССИВ ДИНАМИЧЕСКИХ ОБЪЕКТОВ GameBoard/*
-    
-    cout << "\n2. Создание массива динамических объектов GameBoard..." << endl;
-    GameBoard** boardArray = new GameBoard * [3];  // Массив указателей на GameBoard
-
-    // Создаем каждый объект динамически
-    for (int i = 0; i < 3; i++) {
-        boardArray[i] = new GameBoard();  // Создаем объект в куче
-        cout << "GameBoard " << i << " создан, размер: " << boardArray[i]->getSize() << endl;
-    }
-
-    // Очистка массива динамических объектов
-    for (int i = 0; i < 3; i++) {
-        delete boardArray[i];  // Удаляем каждый объект
-    }
-    delete[] boardArray;  // Удаляем массив указателей
-    cout << "Массив динамических объектов GameBoard удален" << endl;
-}
-
-// Демонстрация работы с указателями и ссылками
-void GameSession::YkazObject() {
-    cout << "\n=== ДЕМОНСТРАЦИЯ УКАЗАТЕЛЕЙ И ССЫЛОК ===" << endl;
-
-    // 1. РАБОТА С УКАЗАТЕЛЯМИ
-    cout << "1. Работа с указателями:" << endl;
-    int x = 5;
-    int* ptr = &x;  // Указатель хранит адрес переменной x
-
-    cout << "   Значение x: " << x << endl;
-    cout << "   Адрес x: " << &x << endl;
-    cout << "   Значение через указатель: " << *ptr << endl;  // * - разыменование
-
-    *ptr = 10;  // Изменяем значение через указатель
-    cout << "   Новое значение x после *ptr = 10: " << x << endl;
-
-    // 2. РАБОТА С ССЫЛКАМИ
-    cout << "\n2. Работа со ссылками:" << endl;
-    int y = 20;
-    int& ref = y;  // Ссылка - псевдоним для переменной y
-
-    cout << "   Значение y: " << y << endl;
-    cout << "   Значение через ссылку: " << ref << endl;
-
-    ref = 30;  // Изменяем значение через ссылку
-    cout << "   Новое значение y после ref = 30: " << y << endl;
-
-    // 3. УКАЗАТЕЛИ НА МЕТОДЫ КЛАССА
-    cout << "\n3. Указатели на методы класса:" << endl;
-
-    // Объявляем указатель на метод класса GameBoard
-    bool (GameBoard:: * methodPtr)(int, int) = &GameBoard::receiveShot;
-
-    // Вызов метода через указатель на метод
-    bool result = (aiBoard->*methodPtr)(0, 0);  // ->* - специальный оператор
-    cout << "   Результат выстрела через указатель на метод: " << result << endl;
-
-    // 4. ПЕРЕДАЧА ОБЪЕКТОВ ПО ССЫЛКЕ И УКАЗАТЕЛЮ
-    cout << "\n4. Передача объектов по ссылке и указателю:" << endl;
-
-    // Ссылка не может быть перенаправлена, указатель - может
-    GameBoard& boardRef = *aiBoard;  // Ссылка на существующий объект
-    GameBoard* boardPtr = aiBoard;   // Указатель на тот же объект
-
-    cout << "   Размер поля через ссылку: " << boardRef.getSize() << endl;
-    cout << "   Размер поля через указатель: " << boardPtr->getSize() << endl;
-}
 
 // Основной метод запуска игры
 void GameSession::startGame() {
     cout << "=== МОРСКОЙ БОЙ ===" << endl;
     cout << "Добро пожаловать, " << humanPlayer->getName() << "!" << endl;
 
-    // Демонстрация работы с динамической памятью
-   // demonstrateDynamicObjects();
-    //demonstratePointersAndReferences();
 
     // 1. расстановка кораблей
     setupGame();
@@ -167,7 +63,7 @@ void GameSession::startGame() {
     cout << "\n=== Итог ===" << endl;
     humanPlayer->displayBoards();
     displayMoveHistory();  // Показываем историю ходов
-
+    showStats(*this);
     cout << "\n=== ИГРА ЗАВЕРШЕНА ===" << endl;
     if (humanPlayer->hasLost()) {
         cout << "ВЫ ПРОИГРАЛИ!" << endl;
@@ -198,46 +94,114 @@ void GameSession::setupGame() {
 
 // Ход игрока
 void GameSession::playerTurn() {
-    cout << "--- ВАШ ХОД ---" << endl;
 
     int x, y;
     bool validInput = false;
 
-    // Цикл ввода координат
+
     while (!validInput) {
-        string input;
-        cout << "Введите координаты (например A1): ";
-        cin >> input;
-
-        // Проверка формата ввода
-        if (input.length() < 2) {
-            cout << "Неверный формат!" << endl;
-            continue;
-        }
-
-        // Преобразование буквенной координаты в число (A=0, B=1, ...)
-        y = toupper(input[0]) - 'A';
-
-        // Преобразование числовой координаты
         try {
+            string input;
+            cout << "Введите координаты (например A1): ";
+            cin >> input;
+
+            if (input == "S" || input == "s") {
+                // Показываем текущую статистику
+                showStats(*this);
+                cout << "Нажмите Enter для продолжения...";
+                cin.ignore();
+                cin.get();
+            }
+
+            if (input.length() > 2) {  
+                throw invalid_argument("Неверный формат! Нужно 2 символа.");
+                
+            }
+
+            // Преобразование буквенной координаты
+            y = toupper(input[0]) - 'A';
+            if (y < 0 || y >= SIZE_BOARD) {
+                throw out_of_range("Буква должна быть от A до " + string(1, 'A' + SIZE_BOARD - 1));
+            }
+
+            // Преобразование числовой координаты
             x = stoi(input.substr(1)) - 1;
-        }
-        catch (...) {
-            cout << "Неверные координаты!" << endl;
-            continue;
-        }
+            if (x < 0 || x >= SIZE_BOARD) {
+                throw out_of_range("Число должно быть от 1 до " + to_string(SIZE_BOARD));
+            }
 
-        // Проверка границ поля
-        if (x < 0 || x >= SIZE_BOARD || y < 0 || y >= SIZE_BOARD) {
-            cout << "Координаты вне поля!" << endl;
-            continue;
+            validInput = true;
         }
-
-        validInput = true;
+        catch (const invalid_argument& e) {
+            cout << "Ошибка формата: " << e.what() << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
+        catch (const out_of_range& e) {
+            cout << "Ошибка диапазона: " << e.what() << endl;
+        }
+        catch (const exception& e) {
+            cout << "Неожиданная ошибка: " << e.what() << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
     }
+    /*
+        // Цикл ввода координат
+        while (!validInput) {
+            cout << "--- ВАШ ХОД ---" << endl;
+            cout << "Команды: S - статистика, Q - выйти" << endl;  // Добавили команду статистики
 
-    // Проверка, не стреляли ли уже в эту клетку
-    //Объукту aiCellState через метод из GameBoard присваиваем значение клетки через класс CellState
+            string input;
+            cout << "Введите координаты или команду: ";
+            cin >> input;
+
+            // Обработка команд
+            if (input == "S" || input == "s") {
+                // Показываем текущую статистику
+                showStats(*this);
+                cout << "Нажмите Enter для продолжения...";
+                cin.ignore();
+                cin.get();
+                return;  // Пропускаем ход
+            }
+            else if (input == "Q" || input == "q") {
+                cout << "Выход из игры..." << endl;
+                exit(0);
+            }
+           // string input;
+           // cout << "Введите координаты (например A1): ";
+           // cin >> input;
+
+            // Проверка формата ввода
+            if (input.length() < 2) {
+                cout << "Неверный формат!" << endl;
+                continue;
+            }
+
+            // Преобразование буквенной координаты в число (A=0, B=1, ...)
+            y = toupper(input[0]) - 'A';
+
+            // Преобразование числовой координаты
+            try {
+                x = stoi(input.substr(1)) - 1;
+            }
+            catch (...) {
+                cout << "Неверные координаты!" << endl;
+                continue;
+            }
+
+            // Проверка границ поля
+            if (x < 0 || x >= SIZE_BOARD || y < 0 || y >= SIZE_BOARD) {
+                cout << "Координаты вне поля!" << endl;
+                continue;
+            }
+
+            validInput = true;
+        }*/
+
+        // Проверка, не стреляли ли уже в эту клетку
+        //Объукту aiCellState через метод из GameBoard присваиваем значение клетки через класс CellState
     CellState aiCellState = aiBoard->getCell(x, y).getState();
 
     if (aiCellState == CellState::HIT || aiCellState == CellState::MISS) {
@@ -265,6 +229,7 @@ void GameSession::playerTurn() {
     cout << "Нажмите Enter для передачи хода противнику...";
     cin.ignore();
     cin.get();
+
 }
 
 // Ход компьютера
@@ -272,7 +237,14 @@ void GameSession::aiTurn() {
     cout << "--- ХОД ПРОТИВНИКА ---" << endl;
 
     // AI делает ход через свой метод makeMove()
-    computerAI->makeMove();
+    if (computerAI->makeMove()) {
+        if (moveCount < maxMoves) {
+            aiHistory[moveCount++] = "Противник попадение";
+        }
+    }
+    else {
+        aiHistory[moveCount++] = "Противник промах";
+    }
 
     // Пауза для удобства 
     cout << "Нажмите Enter...";
@@ -310,5 +282,59 @@ void GameSession::syncPlayerEnemyBoard() {
             CellState aiState = aiBoard->getCell(i, j).getState();
             humanPlayer->getEnemyBoard().getCell(i, j).setState(aiState);
         }
+    }
+}
+void showStats(const GameSession& session) {
+    std::cout << "\n=== СТАТИСТИКА ИГРЫ ===" << std::endl;
+
+    int totalShots = 0;
+    int playerShots = 0;
+    int playerHits = 0;
+    int aiShots = 0;
+    int aiHits = 0;
+
+    // Анализируем историю ходов
+    for (int i = 0; i < session.moveCount; i++) {
+        const std::string& move = session.moveHistory[i];
+        const std::string& aimove = session.aiHistory[i];
+        totalShots++;
+
+        if (move.find("Игрок") != std::string::npos) {
+            playerShots++;
+            if (move.find("попадание") != std::string::npos) {
+                playerHits++;
+            }
+        }
+        if (aimove.find("Противник") != std::string::npos) {
+            aiShots++;
+            if (aimove.find("попадание") != std::string::npos) {
+                aiHits++;
+            }
+        }
+    }
+
+    // Выводим простую статистику
+    std::cout << "Всего ходов: " << totalShots << std::endl;
+    std::cout << "---" << std::endl;
+    std::cout << "Игрок: " << playerHits << " попаданий из " << playerShots << " выстрелов" << std::endl;
+    std::cout << "Компьютер: " << aiHits << " попаданий из " << aiShots << " выстрелов" << std::endl;
+
+    // Простой расчет процентов
+    if (playerShots > 0) {
+        int playerPercent = (playerHits * 100) / playerShots;
+        std::cout << "Ваша точность: " << playerPercent << "%" << std::endl;
+    }
+
+    if (aiShots > 0) {
+        int aiPercent = (aiHits * 100) / aiShots;
+        std::cout << "Точность компьютера: " << aiPercent << "%" << std::endl;
+    }
+
+    // Простой анализ победителя
+    if (session.humanPlayer->hasLost()) {
+        std::cout << "ПОБЕДИТЕЛЬ: КОМПЬЮТЕР" << std::endl;
+    }
+    else {
+        std::cout << "ПОБЕДИТЕЛЬ: ИГРОК" << std::endl;
     }
 }

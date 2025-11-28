@@ -1,11 +1,11 @@
 #pragma once
 #include "GameBoard.hpp"
 #include <string>
-
+#include <memory>
 class Player {
 private:
     std::string name;
-    GameBoard* ownBoard;      // УКАЗАТЕЛЬ на собственное поле (ДИНАМИЧЕСКИЙ ОБЪЕКТ)
+    std::unique_ptr<GameBoard> ownBoard;
     GameBoard& enemyBoard;    // ССЫЛКА на поле противника
     int score;
 
@@ -16,8 +16,7 @@ public:
     // Конструктор принимает ссылку на поле противника
     Player(const std::string& playerName, GameBoard& enemyBoardRef);
 
-    // ДЕСТРУКТОР для очистки динамической памяти
-    ~Player();
+
 
     // Основные методы игрока
     bool makeMove(int x, int y);

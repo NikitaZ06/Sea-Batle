@@ -1,6 +1,7 @@
 #include "Player.hpp"
 #include "GameSession.hpp"
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -9,22 +10,13 @@ Player::Player(const std::string& playerName, GameBoard& enemyBoardRef)
     : name(playerName), enemyBoard(enemyBoardRef), score(0) {
 
     // ДИНАМИЧЕСКОЕ СОЗДАНИЕ ОБЪЕКТА - используем оператор new
-    ownBoard = new GameBoard();
-
+   // ownBoard = new GameBoard();
+    ownBoard=std::make_unique<GameBoard>();
     // Инициализация динамического массива для статистики
-    //initializeStatistics();
 
     //cout << "Динамический объект GameBoard для игрока создан" << endl;
 }
 
-// ДЕСТРУКТОР - очистка динамической памяти
-Player::~Player() {
-    // УДАЛЕНИЕ ДИНАМИЧЕСКИХ ОБЪЕКТОВ - используем оператор delete
-    delete ownBoard;           // Удаляем одиночный объект
-    delete[] hitStatistics;    // Удаляем динамический массив
-
-   // cout << "Динамическая память игрока освобождена" << endl;
-}
 
 // Выполнение хода игрока
 bool Player::makeMove(int x, int y) {

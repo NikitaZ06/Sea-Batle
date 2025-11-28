@@ -9,14 +9,9 @@ using namespace std;
 
 // КОНСТРУКТОР AI - инициализирует ссылки и динамическую память
 AI::AI(GameBoard& aiBoard, GameBoard& playerBoard)
-    : ownBoard(aiBoard), enemyBoard(playerBoard){
+    : ownBoard(aiBoard), enemyBoard(playerBoard) {
     srand(time(0));  // Инициализация генератора случайных чисел
     initializeShotMemory();  // Инициализация динамической памяти для запоминания ходов
-}
-
-// ДЕСТРУКТОР AI - очистка динамической памяти
-AI::~AI() {
-    cleanupShotMemory();  // Очистка динамического двумерного массива
 }
 
 // Инициализация динамического двумерного массива для запоминания ходов
@@ -24,11 +19,11 @@ void AI::initializeShotMemory() {
     // СОЗДАНИЕ ДИНАМИЧЕСКОГО ДВУМЕРНОГО МАССИВА с помощью new
 
     //  Создаем массив указателей на строки
-    shotMemory = new bool* [GameSession::SIZE_BOARD];
-
+   // shotMemory = new bool* [GameSession::SIZE_BOARD];
+    shotMemory = std::make_unique<std::unique_ptr<bool[]>[]>(GameSession::SIZE_BOARD);
     //  Для каждой строки создаем массив булевых значений
     for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
-        shotMemory[i] = new bool[GameSession::SIZE_BOARD];  // Создаем строку из boardSize элементов
+        shotMemory[i] = std::make_unique<bool[]>(GameSession::SIZE_BOARD);  // Создаем строку из boardSize элементов
 
         // 3. Инициализируем все значения false (еще не стреляли)
         for (int j = 0; j < GameSession::SIZE_BOARD; j++) {
@@ -39,21 +34,9 @@ void AI::initializeShotMemory() {
 }
 
 // Очистка динамического двумерного массива
-void AI::cleanupShotMemory() {
-
-    if (shotMemory != nullptr) {
-        for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
-            delete[] shotMemory[i];  // Освобождаем память каждой строки
-        }
-        //  Удаляем массив указателей
-        delete[] shotMemory;
-        shotMemory = nullptr;  // Обнуляем указатель для безопасности
-    }
-    cout << "Динамическая память AI очищена" << endl;
-}
 
 // Основной метод выполнения хода AI
-void AI::makeMove() {
+bool AI::makeMove() {
     cout << "Противник стреляет... ";
 
     int x, y;
@@ -106,16 +89,18 @@ void AI::makeMove() {
     else {
         cout << "ПРОМАХ!" << endl;
     }
+    return wasHit;
 }
 
 // Расстановка кораблей AI
 bool AI::setupShips() {
     // Динамическое создание ShipPlacer
-    ShipPlacer* placer = new ShipPlacer(ownBoard);  // Создаем объект 
+   // ShipPlacer* placer = new ShipPlacer(ownBoard);  // Создаем объект 
+    std::unique_ptr<ShipPlacer> placer = std::make_unique<ShipPlacer>(ownBoard); //Умный указатель 
 
     bool result = placer->AutoPlaceShips();  // расстановка кораблей
 
-    delete placer;  // удаляем динамический объект
+    //delete placer;  // удаляем динамический объект
 
     return result;
 }

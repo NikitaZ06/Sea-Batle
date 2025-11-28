@@ -7,33 +7,19 @@ using namespace std;
 
 // конструктор - создает динамический двумерный массив
 GameBoard::GameBoard() : grid(nullptr) {
-    //выделение памяти для двумерного массива
 
     // Создаем массив указателей на строки
-    grid = new Cell * [GameSession::SIZE_BOARD];
-
+   // grid = new Cell * [GameSession::SIZE_BOARD];
+    grid = std::make_unique<std::unique_ptr<Cell[]>[]>(GameSession::SIZE_BOARD);
     //  Для каждой строки создаем массив ячеек
     for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
-        grid[i] = new Cell[GameSession::SIZE_BOARD];
+        grid[i] = std::make_unique<Cell[]>(GameSession::SIZE_BOARD);
     }
 
    // cout << "Конструктор: выделено памяти для " << SIZE << "x" << SIZE << " ячеек" << endl;
 }
 
-// освобождаем динамическую память
-GameBoard::~GameBoard() {
-    if (grid != nullptr) {
-        // Удаляем каждую строку (массивы ячеек)
-        for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
-            delete[] grid[i];  // Освобождаем память строки
-            grid[i] = nullptr; // Обнуляем указатель
-        }
-        // Удаляем массив указателей
-        delete[] grid;
-        grid = nullptr;
-    }
-    cout << "Деструктор: память освобождена" << endl;
-}
+
 
 // Размещение корабля на поле
 bool GameBoard::placeShip(int x, int y, int size, bool horizontal) {

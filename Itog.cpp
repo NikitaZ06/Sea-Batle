@@ -9,6 +9,7 @@
 #include <iostream>
 #include "ShipPlacer.hpp"
 #include <locale>
+#include <fstream>
 
 
 using namespace std;
@@ -16,9 +17,15 @@ using namespace std;
 // Точка входа в программу
 int main() {
     setlocale(LC_ALL, "Russian");  // Установка русской локали
-  //  game.DynamicObjects();
-   // game.YkazObject();
     cout << "=== МОРСКОЙ БОЙ ===" << endl;
+    try {
+        std::ofstream file("data.txt");
+        if (!file) throw std::runtime_error("Cannot open file");
+        file << "Data";
+    }
+    catch (const std::exception& e) {
+        std::cout << "File error: " << e.what() << std::endl;
+    }
 
     // Ввод имени игрока
     string playerName;

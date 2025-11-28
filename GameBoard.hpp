@@ -1,16 +1,16 @@
 #pragma once
 #include "Cell.hpp"
 #include <vector>
-
+#include <memory>
 class GameBoard
 {
 private:
-    Cell** grid;                 // ДИНАМИЧЕСКИЙ ДВУМЕРНЫЙ МАССИВ - указатель на указатели
-
+   // Cell** grid;                 // ДИНАМИЧЕСКИЙ ДВУМЕРНЫЙ МАССИВ - указатель на указатели
+    std::unique_ptr<std::unique_ptr<Cell[]>[]> grid;
 public:
     // Конструктор и деструктор
     GameBoard();
-    ~GameBoard();
+    //~GameBoard();
 
     // Основные методы
     void Display(bool showShips = false) const; // Вывод поля
