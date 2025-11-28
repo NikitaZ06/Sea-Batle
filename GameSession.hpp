@@ -6,10 +6,10 @@
 #include <memory>
 class GameSession {
 private:
-    // УМНЫЕ УКАЗАТЕЛИ - заменяем сырые указатели
-    std::unique_ptr<GameBoard> aiBoard;           // unique_ptr для исключительного владения
-    std::unique_ptr<Player> humanPlayer;          // unique_ptr для исключительного владения  
-    std::unique_ptr<AI> computerAI;               // unique_ptr для исключительного владения
+    // УМНЫЕ УКАЗАТЕЛИ 
+    std::unique_ptr<GameBoard> aiBoard;           
+    std::unique_ptr<Player> humanPlayer;            
+    std::unique_ptr<AI> computerAI;                
 
     bool isPlayerTurn;            // Чей ход (true - игрок, false - AI)
 

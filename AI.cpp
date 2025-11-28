@@ -50,13 +50,17 @@ bool AI::makeMove() {
         y = rand() % GameSession::SIZE_BOARD;
 
         // ѕровер€ем через дин.массив - не стрел€ли ли уже сюда
-        if (!shotMemory[x][y]) {
+       /* if (!shotMemory[x][y]) {
             CellState state = enemyBoard.getCell(x, y).getState();
             // ѕровер€ем, что в эту клетку еще не стрел€ли
             if (state != CellState::HIT && state != CellState::MISS) {
                 validShot = true;
                 shotMemory[x][y] = true;  // ѕомечаем как использованную в динамическом массиве
             }
+        }*/
+        if (!shotMemory[x][y] && enemyBoard.getCell(x, y)) {  // перешрузка операторов// ≈сли не стрел€ли уже стрел€ть
+            validShot = true;
+            shotMemory[x][y] = true;    //пометить как использованную
         }
         attempts++;
     }

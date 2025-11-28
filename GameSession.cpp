@@ -14,7 +14,8 @@ GameSession::GameSession(const std::string& playerName)
 
     // 1. Создаем поле AI через make_unique
     aiBoard = std::make_unique<GameBoard>();
-
+    GameBoard aiboard2;
+    GameBoard aiboard3 = aiboard2;
     // 2. Создаем игрока, передавая ссылку на поле AI
     humanPlayer = std::make_unique<Player>(playerName, *aiBoard);
 
@@ -146,65 +147,13 @@ void GameSession::playerTurn() {
             cin.ignore(1000, '\n');
         }
     }
-    /*
-        // Цикл ввода координат
-        while (!validInput) {
-            cout << "--- ВАШ ХОД ---" << endl;
-            cout << "Команды: S - статистика, Q - выйти" << endl;  // Добавили команду статистики
-
-            string input;
-            cout << "Введите координаты или команду: ";
-            cin >> input;
-
-            // Обработка команд
-            if (input == "S" || input == "s") {
-                // Показываем текущую статистику
-                showStats(*this);
-                cout << "Нажмите Enter для продолжения...";
-                cin.ignore();
-                cin.get();
-                return;  // Пропускаем ход
-            }
-            else if (input == "Q" || input == "q") {
-                cout << "Выход из игры..." << endl;
-                exit(0);
-            }
-           // string input;
-           // cout << "Введите координаты (например A1): ";
-           // cin >> input;
-
-            // Проверка формата ввода
-            if (input.length() < 2) {
-                cout << "Неверный формат!" << endl;
-                continue;
-            }
-
-            // Преобразование буквенной координаты в число (A=0, B=1, ...)
-            y = toupper(input[0]) - 'A';
-
-            // Преобразование числовой координаты
-            try {
-                x = stoi(input.substr(1)) - 1;
-            }
-            catch (...) {
-                cout << "Неверные координаты!" << endl;
-                continue;
-            }
-
-            // Проверка границ поля
-            if (x < 0 || x >= SIZE_BOARD || y < 0 || y >= SIZE_BOARD) {
-                cout << "Координаты вне поля!" << endl;
-                continue;
-            }
-
-            validInput = true;
-        }*/
+   
 
         // Проверка, не стреляли ли уже в эту клетку
         //Объукту aiCellState через метод из GameBoard присваиваем значение клетки через класс CellState
-    CellState aiCellState = aiBoard->getCell(x, y).getState();
+    //CellState aiCellState = aiBoard->getCell(x, y).getState();
 
-    if (aiCellState == CellState::HIT || aiCellState == CellState::MISS) {
+    if (aiBoard->getCell(x, y).wasShotBefore()) {//Перегрузка оператора
         cout << "Вы уже стреляли в эту клетку! Ход пропускается." << endl;
         addMoveToHistory("Игрок: повторный выстрел в " + string(1, 'A' + y) + to_string(x + 1));
     }

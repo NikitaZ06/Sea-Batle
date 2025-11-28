@@ -68,8 +68,12 @@ bool GameBoard::isGameOver() const
     for (int i = 0; i < GameSession::SIZE_BOARD; i++) {
         for (int j = 0; j < GameSession::SIZE_BOARD; j++) {
             // Если нашли корабль, который не подбит - игра не окончена
-            if (grid[i][j].getHasShip() &&
+          /*  if (grid[i][j].getHasShip() &&
                 grid[i][j].getState() != CellState::HIT) {
+                return false;
+            }*/
+            // Если нашли корабль, который не подбит - игра не окончена
+            if (!grid[i][j]) {  //перегрузка операторов
                 return false;
             }
         }
@@ -180,6 +184,7 @@ void GameBoard::Display(bool showShips) const {
         cout << endl;
     }
 }
+
 
 
 

@@ -4,17 +4,26 @@
 #include <memory>
 
 using namespace std;
-
+int Player::KolvoPlayers = 0;
 // КОНСТРУКТОР - создает динамические объекты
+// ВАЖНО: вызов конструктора базового класса в списке инициализации
 Player::Player(const std::string& playerName, GameBoard& enemyBoardRef)
-    : name(playerName), enemyBoard(enemyBoardRef), score(0) {
+    : GameObject(playerName),  //  ВЫЗОВ конструктора базового класса
+    enemyBoard(enemyBoardRef),
+    score(0) {
 
-    // ДИНАМИЧЕСКОЕ СОЗДАНИЕ ОБЪЕКТА - используем оператор new
-   // ownBoard = new GameBoard();
-    ownBoard=std::make_unique<GameBoard>();
-    // Инициализация динамического массива для статистики
+    ownBoard = std::make_unique<GameBoard>();
+    std::cout << "Игрок " << name << " готов к игре!" << std::endl;
+    cout<< " (всего игроков создано: " << getPlayers << ")" << std::endl;
+    KolvoPlayers++;
+}
 
-    //cout << "Динамический объект GameBoard для игрока создан" << endl;
+void Player::display() const {
+    // Сначала вызываем метод базового класса
+    GameObject::display();  //  Вызов метода базового класса
+
+    // Потом добавляем свою информацию
+    std::cout << "Тип: Игрок, Счет: " << score << std::endl;
 }
 
 
@@ -110,4 +119,9 @@ void Player::displayBoards() const {
 
     // Отображение статистики
    // displayStatistics();
+}
+
+// СТАТИЧЕСКИЙ МЕТОД - не имеет доступа к нестатическим полям!
+int Player::getPlayers() {
+    return KolvoPlayers;
 }

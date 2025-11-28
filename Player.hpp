@@ -2,7 +2,8 @@
 #include "GameBoard.hpp"
 #include <string>
 #include <memory>
-class Player {
+#include "GameObject.hpp"
+class Player : public GameObject {
 private:
     std::string name;
     std::unique_ptr<GameBoard> ownBoard;
@@ -11,11 +12,16 @@ private:
 
     // ДИНАМИЧЕСКИЙ МАССИВ ДЛЯ СТАТИСТИКИ ПОПАДАНИЙ ПО СТОЛБЦАМ
     int* hitStatistics;
+    // СТАТИЧЕСКОЕ ПОЛЕ - общее для всех игроков
+    static int KolvoPlayers;
 
 public:
     // Конструктор принимает ссылку на поле противника
+    // Конструктор вызывает конструктор базового класса
     Player(const std::string& playerName, GameBoard& enemyBoardRef);
 
+    // Переопределяем метод display
+    void display() const ;
 
 
     // Основные методы игрока
@@ -29,5 +35,6 @@ public:
     GameBoard& getOwnBoard() { return *ownBoard; }      // Разыменование указателя
     GameBoard& getEnemyBoard() { return enemyBoard; }   // Возврат ссылки
 
-
+    //СТАТИЧЕСКИЙ МЕТОД - работает без создания объекта
+    static int getPlayers();
 };

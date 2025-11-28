@@ -15,7 +15,17 @@ private:
 public:
     // Конструктор по умолчанию
     Cell();
-
+    //Перегрузка операторов
+    bool operator!() const {
+        return getHasShip() && getState() != CellState::HIT;
+    }
+    explicit operator bool() const {
+        return state != CellState::HIT && state != CellState::MISS;
+    }
+    // Проверка, стреляли ли уже в эту клетку
+    bool wasShotBefore() const {
+        return state == CellState::HIT || state == CellState::MISS;
+    }
     // Геттеры 
     CellState getState() const;
     bool getHasShip() const;

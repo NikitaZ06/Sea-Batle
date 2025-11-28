@@ -126,6 +126,7 @@
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="GameBoard.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameSession.cpp" />
     <ClCompile Include="Itog.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="AI.hpp" />
     <ClInclude Include="Cell.hpp" />
     <ClInclude Include="GameBoard.hpp" />
+    <ClInclude Include="GameObject.hpp" />
     <ClInclude Include="GameSession.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="ShipPlacer.hpp" />

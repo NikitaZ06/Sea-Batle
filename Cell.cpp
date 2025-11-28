@@ -19,8 +19,8 @@ bool Cell::getHasShip() const {
 }
 
 // Устанавливает новое состояние ячейки
-void Cell::setState(CellState newState) {
-    state = newState;  // Присваиваем полю state новое значение
+void Cell::setState(CellState state) {
+    this->state = state;  //использование оператора this// Присваиваем полю state новое значение
 }
 
 // Устанавливает флаг наличия корабля в ячейке
