@@ -1,140 +1,108 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System;
+
+// Player.cs
+using System;
+
 namespace Sea_battle
 {
-
-    // Класс, представляющий игрока
-    public class Player
+    public class Player : GameObjectBase
     {
-        private string name;
-        private GameBoard ownBoard;
-        private GameBoard enemyBoard;  // Ссылка на поле противника
-        private int score;
-
-        // Конструктор игрока
-        public Player(string playerName, GameBoard enemyBoardRef)
+        public Player(string playerName) : base(playerName)
         {
-            name = playerName;
-            enemyBoard = enemyBoardRef;
-            ownBoard = new GameBoard();
-            score = 0;
+            // Установка поведения по умолчанию
+            SetShootingBehavior(new HumanShootingBehavior(playerName));
+            SetPlacementBehavior(new AutoPlacementBehavior());
+
         }
 
-       
-        // Выполнение хода игроком
-        public bool MakeMove(int x, int y)
+        public Player(string playerName, GameBoard enemyBoardRef) : this(playerName)
         {
-            // Проверка повторного выстрела
-            CellState state = enemyBoard.GetCell(x, y).State;
-            if (state == CellState.Hit || state == CellState.Miss)
-            {
-                Console.WriteLine("Вы уже стреляли в эту клетку!");
-                return false;
-            }
-
-            // Выстрел по enemyBoard (который ссылается на поле противника)
-            bool isHit = enemyBoard.ReceiveShot(x, y);
-            return isHit;
-        }
-        /// Обработка выстрела по собственному полю игрока
-        public bool ReceiveShot(int x, int y)
-        {
-            return ownBoard.ReceiveShot(x, y);
+            SetEnemyBoard(enemyBoardRef);
         }
 
-        // Проверка, проиграл ли игрок (все его корабли потоплены)
-        public bool HasLost()
+        // Реализация IGameObject.DisplayInfo()
+        public override void DisplayInfo()
         {
-            return ownBoard.IsGameOver();
-        }
-        // Получение имени игрока
-        public string Name
-        {
-            get { return name; }
+            Console.WriteLine($"=== ИГРОК ===");
+            Console.WriteLine($"Имя: {name}");
+            Console.WriteLine($"Очки: {score}");
+            Console.WriteLine($"Статус: {(HasLost() ? "Проиграл" : "В игре")}");
+            Console.WriteLine($"Тип: Человек");
+
+            var shootingBehavior = GetShootingBehavior();
+            if (shootingBehavior != null)
+                Console.WriteLine($"Поведение стрельбы: {shootingBehavior.GetBehaviorInfo()}");
+
+            var placementBehavior = GetPlacementBehavior();
+            if (placementBehavior != null)
+                Console.WriteLine($"Поведение размещения: {placementBehavior.GetPlacementInfo()}");
         }
 
+        // Реализация IGameObject.PerformAction()
+        public override void PerformAction()
+        {
+            Console.WriteLine($"{name} обдумывает следующий ход...");
+            IncreaseScore(1); // Начисляем очки за размышления
+        }
 
-        // Отображение обоих игровых полей (своего и противника)
+        // Реализация IGameObject.Update()
+        public override void Update()
+        {
+            // Логика обновления состояния игрока
+            IncreaseScore(1);
+        }
+
+        // Дополнительные методы для отображения
         public void DisplayBoards()
         {
-            Console.Write("=== ВАШЕ ПОЛЕ ===");
-            Console.Write("      ");
-            Console.WriteLine("=== ПОЛЕ ПРОТИВНИКА ===");
+            Console.WriteLine("=== ВАШЕ ПОЛЕ ===\t=== ПОЛЕ ПРОТИВНИКА ===");
 
-            // Верхние координаты (буквы)
             Console.Write("  ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + (char)('A' + i));
-            }
-            Console.Write("     ");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write(" " + (char)('A' + i));
-            }
+            for (int i = 0; i < 10; i++) Console.Write(" " + (char)('A' + i));
+            Console.Write("\t  ");
+            for (int i = 0; i < 10; i++) Console.Write(" " + (char)('A' + i));
             Console.WriteLine();
 
-            // Отображение строк полей
             for (int i = 0; i < 10; i++)
             {
-                // Левое поле (собственное)
-                Console.Write(i + 1);
-                Console.Write(i < 9 ? " " : "");  // Выравнивание для двузначных чисел
-
+                // Собственное поле
+                Console.Write($"{i + 1,2}");
                 for (int j = 0; j < 10; j++)
                 {
-                    CellState state = ownBoard.GetCell(i, j).State;
-                    char symbol = '~';
-
-                    switch (state)
-                    {
-                        case CellState.Empty: symbol = '~'; break;
-                        case CellState.Ship: symbol = 'S'; break;
-                        case CellState.Hit: symbol = 'X'; break;
-                        case CellState.Miss: symbol = 'O'; break;
-                    }
+                    char symbol = GetSymbol(ownBoard.GetCell(i, j).State, true);
                     Console.Write(" " + symbol);
                 }
 
-                Console.Write("   ");
+                Console.Write("\t");
 
-                // Правое поле (противника)
-                Console.Write(i + 1);
-                Console.Write(i < 9 ? " " : "");  // Выравнивание для двузначных чисел
-
+                // Поле противника
+                Console.Write($"{i + 1,2}");
                 for (int j = 0; j < 10; j++)
                 {
-                    CellState state = enemyBoard.GetCell(i, j).State;
-                    char symbol = '~';
-
-                    switch (state)
-                    {
-                        case CellState.Empty:
-                        case CellState.Ship:
-                            symbol = '~'; break;  // На поле противника не показываем корабли
-                        case CellState.Hit: symbol = 'X'; break;
-                        case CellState.Miss: symbol = 'O'; break;
-                    }
+                    char symbol = GetSymbol(GetEnemyBoard()?.GetCell(i, j).State ?? CellState.Empty, false);
                     Console.Write(" " + symbol);
                 }
                 Console.WriteLine();
             }
         }
- 
-        // Получение собственного поля игрока
-        public GameBoard OwnBoard
-        {
-            get {return ownBoard; }
-        }
 
-        // Получение поля противника
-        public GameBoard EnemyBoard
+        private char GetSymbol(CellState state, bool isOwnBoard)
         {
-            get { return enemyBoard; }
+            return state switch
+            {
+                CellState.Empty => '~',
+                CellState.Ship => isOwnBoard ? 'S' : '~',
+                CellState.Hit => 'X',
+                CellState.Miss => 'O',
+                _ => '~'
+            };
         }
     }
 }

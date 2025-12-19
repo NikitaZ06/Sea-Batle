@@ -4,67 +4,98 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System;
+using System;
+using System.Collections.Generic;
+
+// AI.cs
+using System;
+
 namespace Sea_battle
 {
-    public class AI
+    public class AI : GameObjectBase
     {
-        private GameBoard ownBoard;      // Собственное поле AI (корабли AI)
-        private GameBoard enemyBoard;    // Поле игрока (куда AI стреляет)
-        private Random random;           // Генератор случайных чисел
+        private int difficultyLevel;
 
-        // Конструктор
-        public AI(GameBoard aiBoard, GameBoard playerBoard)
+        public AI(string aiName, int difficulty = 1) : base(aiName)
         {
-            ownBoard = aiBoard;
-            enemyBoard = playerBoard;
-            random = new Random();  // Инициализация генератора случайных чисел
+            difficultyLevel = difficulty;
+
+            // Установка поведения в зависимости от сложности
+            SetShootingBehavior(new AIShootingBehavior(aiName, difficulty));
+            SetPlacementBehavior(new AutoPlacementBehavior());
+
         }
 
-        // ХОД AI - СЛУЧАЙНАЯ СТРЕЛЬБА
-        public void MakeMove()
+        // Реализация IGameObject.DisplayInfo()
+        public override void DisplayInfo()
         {
-            Console.Write("Противник стреляет... ");
+            Console.WriteLine($"=== ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ ===");
+            Console.WriteLine($"Имя: {name}");
+            Console.WriteLine($"Очки: {score}");
+            Console.WriteLine($"Уровень сложности: {difficultyLevel}");
+            Console.WriteLine($"Статус: {(HasLost() ? "Уничтожен" : "Активен")}");
+            Console.WriteLine($"Тип: AI");
 
-            int x=0;
-            int y=0;
-            bool validShot = false;
+            var shootingBehavior = GetShootingBehavior();
+            if (shootingBehavior != null)
+                Console.WriteLine($"Поведение стрельбы: {shootingBehavior.GetBehaviorInfo()}");
 
-            // Ищем случайную свободную клетку
-            while (!validShot)
+            var placementBehavior = GetPlacementBehavior();
+            if (placementBehavior != null)
+                Console.WriteLine($"Поведение размещения: {placementBehavior.GetPlacementInfo()}");
+        }
+
+        // Реализация IGameObject.PerformAction()
+        public override void PerformAction()
+        {
+            Console.WriteLine($"{name} анализирует игровую ситуацию...");
+
+            switch (difficultyLevel)
             {
-                x = random.Next(0, 10);
-                y = random.Next(0, 10);
-
-                // Проверяем, не стреляли ли уже сюда
-                // CellState state = enemyBoard.GetCell(x, y).GetState();
-                CellState state = enemyBoard.GetCell(x, y).State;
-                if (state != CellState.Hit && state != CellState.Miss)
-                {
-                    validShot = true;
-                }
+                case 1:
+                    Console.WriteLine("  'Случайная атака...'");
+                    break;
+                case 2:
+                    Console.WriteLine("  'Анализирую поле противника...'");
+                    break;
+                case 3:
+                    Console.WriteLine("  'Вычисляю оптимальную стратегию...'");
+                    break;
             }
 
-            // Совершаем выстрел
-            Console.Write($"в {(char)('A' + y)}{(x + 1)}... ");
-
-            bool wasHit = enemyBoard.ReceiveShot(x, y);
-            string result = wasHit ? "ПОПАДАНИЕ!" : "ПРОМАХ!";
-            Console.WriteLine(result);
+            IncreaseScore(difficultyLevel);
         }
 
-        // Расстановка кораблей - используем  ShipPlacer
-        public bool SetupShips()
+        // Реализация IGameObject.Update()
+        public override void Update()
         {
-            ShipPlacer placer = new ShipPlacer(ownBoard);
-            bool exit;
-            exit=placer.AutoPlaceShips() == true?true:false;
-            return exit;
+            // AI может "обучаться" во время игры
+            IncreaseScore(difficultyLevel * 2); // Чем сложнее AI, тем больше очков
         }
 
-        // Проверка, проиграл ли AI
-        public bool HasLost()
+        // Метод для автономной игры (использует делегированное поведение)
+        public bool MakeMove()
         {
-            return ownBoard.IsGameOver();  // Проверяем собственное поле!
+            if (GetEnemyBoard() == null)
+            {
+                Console.WriteLine("Ошибка: у AI нет поля противника");
+                return false;
+            }
+
+            Console.WriteLine($"{name} делает ход...");
+            PerformAction();
+
+            // Вызываем делегированное поведение
+            var shootingBehavior = GetShootingBehavior();
+            if (shootingBehavior != null)
+            {
+                return shootingBehavior.Shoot(-1, -1, GetEnemyBoard());
+            }
+
+            return false;
         }
+
+        // Свойство только для чтения
+        public int Difficulty => difficultyLevel;
     }
 }

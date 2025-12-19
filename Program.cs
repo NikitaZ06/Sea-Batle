@@ -1,39 +1,36 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using Sea_battle;
 using System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Sea_battle
+class Program
 {
-    // Главный класс программы - точка входа в приложение
-
-    class Program
+    static void Main()
     {
-        // Главный метод - точка входа в программу
-        static void Main()
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+       
+
+        Console.WriteLine("\n=== ЗАПУСК  ИГРЫ ===");
+
+        string playerName;
+        Console.Write("Введите ваше имя: ");
+        playerName = Console.ReadLine();
+
+        if (string.IsNullOrEmpty(playerName))
         {
-            // Устанавливаем кодировку для поддержки русского языка
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            Console.WriteLine("=== МОРСКОЙ БОЙ ===");
-
-            string playerName;
-            Console.Write("Введите ваше имя: ");
-            playerName = Console.ReadLine();
-
-            // Проверка на пустое имя
-            if (string.IsNullOrEmpty(playerName))
-            {
-                playerName = "Игрок";
-            }
-
-            // Создаем и запускаем игру
-            GameSession game = new GameSession(playerName);
-            game.StartGame();
-
-            Console.WriteLine("\nСпасибо за игру!");
-
-            // Ожидаем нажатия любой клавиши перед выходом
-            Console.WriteLine("Нажмите любую клавишу для выхода...");
-            Console.ReadKey();
+            playerName = "Игрок";
         }
+
+        // Запускаем игру
+        GameSession game = new GameSession(playerName);
+
+        game.StartGame();
+
+        Console.WriteLine("\nСпасибо за игру!");
+        Console.WriteLine("Нажмите любую клавишу для выхода...");
+        Console.ReadKey();
     }
 }

@@ -1,4 +1,5 @@
 ﻿
+using Sea_battle;
 using System;
 using System;
 using System.Collections.Generic;
@@ -6,230 +7,147 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Sea_battle
 {
-
-    //Класс управления игровой сессией "Морской бой"
-
     public class GameSession
     {
-        private GameBoard aiBoard;           // Поле AI
-        private Player humanPlayer;          // Игрок-человек
-        private AI computerAI;               // Искусственный интеллект
-        private bool isPlayerTurn;           // Чей сейчас ход (true - игрок, false - AI)
+        private GameBoard aiBoard;
+        private Player humanPlayer;
+        private AI computerAI;
+        private bool isPlayerTurn;
 
-        // Конструктор игровой сессии
+        // Контейнер для игровых объектов
+        private List<IGameObject> gameObjects = new List<IGameObject>();
+
+
         public GameSession(string playerName)
         {
-            aiBoard = new GameBoard();                           // 1. Сначала создаем aiBoard
-            humanPlayer = new Player(playerName, aiBoard);       // 2. Затем Player с ссылкой на aiBoard
-            computerAI = new AI(aiBoard, humanPlayer.OwnBoard); // 3. AI получает aiBoard и поле игрока
+            aiBoard = new GameBoard();
+            humanPlayer = new Player(playerName);
+            humanPlayer.SetEnemyBoard(aiBoard);
+
+            computerAI = new AI("Компьютер", 1);
+            computerAI.SetEnemyBoard(humanPlayer.GetOwnBoard());
+
             isPlayerTurn = true;
         }
 
-        // Запуск игры - основной игровой цикл
         public void StartGame()
         {
             Console.WriteLine("=== МОРСКОЙ БОЙ ===");
-            Console.WriteLine($"Добро пожаловать, {humanPlayer.Name}!");
 
-            // 1. НАСТРОЙКА  
-            SetupGame();
-            Console.WriteLine("\nНачальная расстановка:");
-            humanPlayer.DisplayBoards();
-            Console.WriteLine();
+            // Расстановка кораблей
+            humanPlayer.SetupShips();
+            computerAI.SetupShips();
 
-            // Основной игровой цикл
-            while (!IsGameOver())
+            Console.WriteLine("\nНажмите Enter для начала игры...");
+            Console.ReadLine();
+
+            PlayGame();
+        }
+
+        private void PlayGame()
+        {
+            while (!humanPlayer.HasLost() && !computerAI.HasLost())
             {
+                Console.Clear();
+                Console.WriteLine("=== ХОД ИГРЫ ===");
+
                 if (isPlayerTurn)
                 {
                     PlayerTurn();
                 }
                 else
                 {
-                    AITurn();
-
-                    // ПОКАЗЫВАЕМ РЕЗУЛЬТАТЫ ПОСЛЕ ХОДА AI
-                    Console.WriteLine("\n=== ТЕКУЩАЯ СИТУАЦИЯ ===");
-                    humanPlayer.DisplayBoards();
-                    Console.WriteLine();
+                    ComputerTurn();
                 }
 
-                isPlayerTurn = !isPlayerTurn; // Передача хода
+                isPlayerTurn = !isPlayerTurn;
+
+                if (!humanPlayer.HasLost() && !computerAI.HasLost())
+                {
+                    Console.WriteLine("\nНажмите Enter для продолжения...");
+                    Console.ReadLine();
+                }
             }
 
-            // Финальное отображение
-            Console.WriteLine("\n=== ФИНАЛЬНАЯ СИТУАЦИЯ ===");
-            humanPlayer.DisplayBoards();
-
             Console.WriteLine("\n=== ИГРА ЗАВЕРШЕНА ===");
-            string t;
-            t=humanPlayer.HasLost() ? "ВЫ ПРОИГРАЛИ!" : "ВЫ ПОБЕДИЛИ!";
-            Console.WriteLine(t);
-            
+            if (humanPlayer.HasLost())
+                Console.WriteLine("Вы проиграли! Все ваши корабли потоплены.");
+            else
+                Console.WriteLine("Поздравляем! Вы победили компьютера!");
         }
 
-        // Настройка игры - расстановка кораблей
-        private void SetupGame()
-        {
-            Console.WriteLine("\n--- РАССТАНОВКА КОРАБЛЕЙ ---");
-
-            // ИГРОК расставляет
-            ShipPlacer playerPlacer = new ShipPlacer(humanPlayer.OwnBoard);
-            Console.WriteLine("Ваша расстановка:");
-            playerPlacer.AutoPlaceShips();
-
-            // КОМПЬЮТЕР расставляет
-            Console.WriteLine("\nПротивник расставляет корабли...");
-            ShipPlacer aiPlacer = new ShipPlacer(aiBoard);
-            aiPlacer.AutoPlaceShips();
-
-            Console.WriteLine("\nНАЧИНАЕМ ИГРУ!");
-        }
-
-        // Ход игрока
         private void PlayerTurn()
         {
-            Console.WriteLine("--- ВАШ ХОД ---");
+            Console.WriteLine("\n--- ВАШ ХОД ---");
+            humanPlayer.DisplayBoards();
 
             int x = -1, y = -1;
             bool validInput = false;
 
-            // Цикл для получения корректных координат
-            while (!validInput)
+            do
             {
-                Console.Write("Введите координаты (например A1): ");
-                string input = Console.ReadLine();
+                Console.Write("\nВведите координаты для выстрела (например, A1): ");
+                string input = Console.ReadLine()?.ToUpper();
 
                 if (string.IsNullOrEmpty(input) || input.Length < 2)
                 {
-                    Console.WriteLine("Неверный формат!");
+                    Console.WriteLine("Неверный формат. Пример: A1, B5, J10");
                     continue;
                 }
 
-                // Преобразуем буквенную координату в число
-                y = char.ToUpper(input[0]) - 'A';
-
-                // Преобразуем числовую координату
-                if (int.TryParse(input.Substring(1), out int xCoord))//проверка координат 
+                char letter = input[0];
+                if (letter < 'A' || letter > 'J')
                 {
-                    x = xCoord - 1;
-                }
-                else
-                {
-                    Console.WriteLine("Неверные координаты!");
+                    Console.WriteLine("Буква должна быть от A до J");
                     continue;
                 }
 
-                // Проверка границ поля
-                if (x < 0 || x >= 10 || y < 0 || y >= 10)
+                string numberPart = input.Substring(1);
+                if (!int.TryParse(numberPart, out int number) || number < 1 || number > 10)
                 {
-                    Console.WriteLine("Координаты вне поля!");
+                    Console.WriteLine("Число должно быть от 1 до 10");
+                    continue;
+                }
+
+                x = number - 1;
+                y = letter - 'A';
+
+                // Проверяем, можно ли сделать выстрел в эту клетку
+                CellState state = aiBoard.GetCell(x, y).State;
+                if (state == CellState.Hit || state == CellState.Miss)
+                {
+                    Console.WriteLine("Вы уже стреляли в эту клетку. Попробуйте другие координаты.");
                     continue;
                 }
 
                 validInput = true;
-            }
 
-            // Проверяем, не стреляли ли уже сюда
-            CellState aiCellState = aiBoard.GetCell(x, y).State;
+            } while (!validInput);
 
-            if (aiCellState == CellState.Hit || aiCellState == CellState.Miss)
-            {
-                Console.WriteLine("Вы уже стреляли в эту клетку! Ход пропускается.");
-            }
-            else
-            {
-                // Делаем выстрел
-                bool wasHit = aiBoard.ReceiveShot(x, y);
+            // Выполняем выстрел через игрока
+            bool validShot = humanPlayer.Shoot(x, y);
+            Console.WriteLine(validShot ? "ПОПАДАНИЕ!" : "ПРОМАХ!");
 
-                // Обновляем поле противника у игрока
-                if (wasHit)
-                {
-                    Console.WriteLine("ПОПАДАНИЕ! Вы попали в корабль противника!");
-                    humanPlayer.EnemyBoard.GetCell(x, y).State=CellState.Hit;
-                }
-                else
-                {
-                    Console.WriteLine("ПРОМАХ!");
-                    humanPlayer.EnemyBoard.GetCell(x, y).State = CellState.Miss;
-                }
-            }
-
-            Console.Write("Нажмите Enter для передачи хода противнику...");
-            Console.ReadLine();
-        }
-
-       
-        // Ход компьютера (AI)
-        
-        private void AITurn()
-        {
-            Console.WriteLine("--- ХОД ПРОТИВНИКА ---");
-
-            int x=0, y=0;
-            bool validShot = false;
-            Random random = new Random();
-
-            // Поиск валидной клетки для выстрела
-            while (!validShot)
-            {
-                x = random.Next(0, 10);
-                y = random.Next(0, 10);
-
-                // Проверяем, не стреляли ли уже сюда
-                CellState state = humanPlayer.OwnBoard.GetCell(x, y).State;
-                if (state != CellState.Hit && state != CellState.Miss)
-                {
-                    validShot = true;
-                }
-            }
-
-            // Вычисляем координаты для отображения
-            char column = (char)('A' + y);
-            int row = x + 1;
-
-            Console.Write($"Противник стреляет в {column}{row}... ");
-
-            // AI стреляет по полю игрока
-            bool wasHit = humanPlayer.OwnBoard.ReceiveShot(x, y);
-
-            string t;
-            t=wasHit ? "ПОПАДАНИЕ!" : "ПРОМАХ!";
-            Console.WriteLine(t);
-
-            Console.Write("Нажмите Enter...");
-            Console.ReadLine();
-        }
-
-        // Проверка окончания игры
-        private bool IsGameOver()
-        {
-            bool playerLost = humanPlayer.HasLost();//true если все корабли потоплены
-            bool aiLost = computerAI.HasLost();
-            return playerLost || aiLost;
-        }
-
-        // Синхронизация поля противника у игрока с актуальным состоянием
-        private void SyncPlayerEnemyBoard()
-        {
-            // Копируем все состояния из aiBoard в enemyBoard игрока
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 10; j++)
-                {
-                    CellState aiState = aiBoard.GetCell(i, j).State;
-                    humanPlayer.EnemyBoard.GetCell(i, j).State = aiState;
-                }
-            }
-        }
-
-        // Отображение текущего состояния игры
-        private void DisplayGameState()
-        {
+            // Показываем обновленные поля
+            Console.WriteLine("\nРезультат вашего выстрела:");
             humanPlayer.DisplayBoards();
+        }
+
+        private void ComputerTurn()
+        {
+            Console.WriteLine("\n--- ХОД КОМПЬЮТЕРА ---");
+            computerAI.MakeMove();
+            Console.WriteLine("Компьютер сделал ход.");
+
+            // Показываем обновленное поле игрока
+            Console.WriteLine("\nВаше поле после хода компьютера:");
+            humanPlayer.OwnBoard.Display(true);
         }
     }
 }
